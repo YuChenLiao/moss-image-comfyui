@@ -28,7 +28,15 @@ masterpiece, best quality, anime style, cel shading,
 
 顺序遵循 MOSS 官方推荐的 Danbooru 惯例：Quality → Score → Meta → Year → Character → Series → Artist → General。
 
+引擎之外的英文 tag 只用来锚定身份与画风，其余交给中文。像"光从左上斜射，斑驳树影落在她身上，逆光让发丝与裙摆边缘透亮发光"这类描述，tag 拆不出来，中文一句就够。
+
+![窗台光柱](docs/images/04-window-rays.jpg)
+
 ![教堂婚纱](docs/images/03-wedding.jpg)
+
+L3 档位（全描述）适合这种元素密集的场景：温室的金属框架、悬挂的多肉玻璃球、烧瓶三脚架和摊开的书，逐件点名加方位，一次写满两百字。中文写得越长，MOSS 越不容易丢元素。
+
+![玻璃温室](docs/images/02-greenhouse.jpg)
 
 ## 内容结构
 
@@ -54,7 +62,7 @@ masterpiece, best quality, anime style, cel shading,
 
 换角色只动 `character_tag` 和 `series_tag`，其余全部复用；换画风只动 `artist`。同一套构图做多个角色版本时，把原角色的发色瞳色写进负面防止串色。
 
-![黑翼宝库](docs/images/04-black-wings.jpg)
+![晴天街道](docs/images/06-street-plana.jpg)
 
 ## 参考图复刻
 
@@ -64,7 +72,7 @@ masterpiece, best quality, anime style, cel shading,
 
 其中一条值得单独说：**光柱和朦胧感在 MOSS 里互相拉扯**。整体提亮到高调，丁达尔光柱就会被白茫茫吃进去；保住光柱，画面就发闷。这两个没法同时要。
 
-![花园秋千](docs/images/06-swing.jpg)
+![花园秋千](docs/images/05-swing.jpg)
 
 ## 用法
 
@@ -77,6 +85,8 @@ git clone https://github.com/<your-name>/moss-image-comfyui.git ~/.dsh/skills/mo
 也可以直接当文档读——`reference/` 下四个文件是自包含的 Markdown。
 
 如果你的 agent 支持 skill 目录约定，把整个仓库丢进 skills 目录即可，`SKILL.md` 的 frontmatter 会自动注册。
+
+![俯视裙摆](docs/images/07-maid-overhead.jpg)
 
 ## 实测环境
 
