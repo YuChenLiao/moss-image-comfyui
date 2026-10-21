@@ -48,6 +48,20 @@ VAELoader(flux2-vae) → VAEDecode
 
 latent 用 `EmptyFlux2LatentImage`（128 通道），不要用 SD 的 `EmptyLatentImage`。
 
+### 加速档：8 步 DMD LoRA
+
+装 `lodestones/MOSS-Image-SFT-8-steps-dmd` 的 `lora.safetensors`（1.13GB）到 `models/loras/`，链路改成 `UNETLoader → LoraLoaderModelOnly → KSampler`，**必须去掉 SLG**（每步两次前向，会把加速全吃掉）。
+
+| 参数 | 值 |
+|---|---|
+| steps | 8（试构图）/ 12（定稿） |
+| cfg | **1.5**（上游说 "no CFG"，实测 1.0 出伪影） |
+| lora strength | 1.0（换 `lora_latest` 用 0.7） |
+
+1264×1824 实测：8 步 36s、12 步 50s、16 步 63s，对比 50 步的 230s。代价是语义遵循度下降，细节多的场景建议 12 步起步。
+
+图生图同样能接这个 LoRA（`VAEEncode → LoraLoaderModelOnly → KSampler`，denoise 0.9，12 步约 58s），**同耗时下 i2i 的姿态比 t2i 更贴参考图**，因为带进了原图的构图轮廓。复杂动作建议：i2i + 12 步先定构图，50 步 t2i 再补关节精度。完整对照见 `reference/workflows.md`。
+
 ## 提示词核心
 
 顺序（MOSS 官方推荐，Danbooru 惯例）：Quality → Score → Meta → Year → Character → Series → Artist → General。
