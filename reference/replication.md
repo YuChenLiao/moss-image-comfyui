@@ -48,6 +48,8 @@ tag 段放身份锚点；中文段按"场景 → 姿势 → 服装 → 道具 �
 
 | 症状 | 对策 |
 |---|---|
+| 支撑物变多（一只抱枕变成两只、靠垫重复） | 只写"一个巨大的抱枕"不够。正向要写死"画面里只有一只 X，她只靠在这一只 X 上"，负面压 `two pillows, multiple pillows, extra pillow`。实测前两版都会凭空长出第二只，腿一旦去压它就更明显 |
+| 腿被抬高、脚翘到画面上方 | 别用"膝盖弯曲搭在另一条腿上"——"搭在…上方"会被理解成高抬腿。改成"右腿屈膝侧放、小腿贴地、脚背朝下"，负面压 `raised leg, leg up, foot in the air` |
 | 腿被拉长、大头 | 姿势换成折叠态（抱膝、蜷坐），加"四肢长度自然，头身比例正常，头部与肩宽协调"，负面压 `long legs, elongated body, big head` |
 | 手指畸形 | 正向"双手五指分明，每只手五根手指，关节位置正确"，负面 `extra fingers, six fingers, fused fingers, bad hands` |
 | 服装跑偏 | 长度与材质双写（"极短只到大腿根部"+"薄纱半透明"），负面反向压（`long dress, opaque fabric, thick lace`） |
