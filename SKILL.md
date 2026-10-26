@@ -76,6 +76,8 @@ masterpiece, best quality, anime style, cel shading,
 
 四条必守：角色用 Danbooru 官方 tag 而非中文名；画师带 `@` 前缀；二次元风格必须显式锁 `anime style, cel shading, clean lineart`，否则往半写实漂；负面提示词中英混写都生效。
 
+上面是 **Tag 模式**。MOSS 还能吃纯自然语言 Caption 和带坐标的 JSON Layout（海报排版、漫画分格、多人严格占位必须用它）。三种格式的画风首句、质量词取舍、多人主语绑定、Layout 坐标转换全在 `reference/prompting-formats.md`——**换格式前先读它**，尤其别把 `masterpiece, best quality` 带进 Caption 和 Layout。
+
 ## 文件导航
 
 按需读取，不要一次全看。
@@ -83,6 +85,7 @@ masterpiece, best quality, anime style, cel shading,
 | 需要什么 | 读哪个 |
 |---|---|
 | 复杂度分级（L1/L2/L3）、维度清单、变量模板与词组库 | `reference/prompting.md` |
+| 三种输出格式（Tag/Caption/Layout）、画风首句、Layout JSON 坐标、多人主语绑定、光照与材质 | `reference/prompting-formats.md` |
 | 参考图复刻四步流程、问题修正对照表 | `reference/replication.md` |
 | 四种工作流、性能与故障对照、配套节点 | `reference/workflows.md` |
 | 实测完整提示词示例（单双人、变量替换） | `reference/examples.md` |
