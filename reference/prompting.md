@@ -58,3 +58,7 @@ masterpiece, best quality, anime style, cel shading,
 | `aspect` | 直接定尺寸，16 倍数，≤2.3MP | 1264×1808 竖 / 1888×1232 横 / 2224×1008 超宽 |
 
 **替换规则**：换角色只动 `character_tag` 和 `series_tag`，其余全部复用；换画风只动 `artist`；同一套构图做 N 个角色版本时，把原角色的发色瞳色写进负面防串色。
+
+**画师 tag 不要加权重。** 实测同一底模、同种子、同构图下对比 `(@deyui:1.3)` 与裸 `@deyui`：加权版饱和度被拉高、线条变硬、表情夸张，反而**偏离**该画师本来的柔光低饱和调子；裸 tag 给出的才是模型对这个画师的真实先验。权重把画师当成一个强特征去放大，会把整体色彩分布一起拽走（同一次实验里连服装都被挤掉了）。需要更强的风格指向时，补描述词（`soft shading, warm skin tone, delicate lineart, gentle expression`）或上风格 LoRA，不要动权重。
+
+画师效果强度还受底模影响：SFT 底模上裸 tag 更干净，Base 上需要靠其他因素撑；4 步 DMD / turbo 档会明显削弱画师特征，因为蒸馏阶段把风格细节一起压掉了。

@@ -106,6 +106,24 @@ README 写的是"8 步、no CFG"，实测 **CFG 1.0 会出伪影**——连裤�
 | 画面突然变水墨/厚涂 | 缺 `anime style, cel shading`；或换了 `@wlop` 这类半写实画师 |
 | 生成到一半 ComfyUI 进程消失 | 分辨率过大导致显存溢出（4MP 必崩） |
 | 提示词元素缺失 | 顺序错乱（中文描述混进了 character/series 段之间）；按官方顺序重排 |
+| 皮肤像涂了油、塑料感、高光过曝 | 正向里有 `wet, sweat, water drops, 汗珠, 湿润` —— 这些词会把皮肤推成镜面反射，叠加 4 步 turbo 的粗糙采样就是塑料感。删掉它们并写进负面 `oily skin, plastic skin, glossy, harsh highlight`，换成「柔和的漫射光、高光只落在受光凸起处」 |
+| 画师风格出不来 | 先删掉画师 tag 上的权重（`(@artist:1.3)` → `@artist`），权重反而会把画面推离该画师的调子；其次是底模，4 步 DMD/turbo 档会削弱画师特征，用 SFT 或 50 步档 |
+
+## 参考图 + 姿势参考（双图输入）
+
+要「人设图定角色、姿势图定姿势」时，**只有一条路走得通**：参考图走 i2i 当首帧 latent，姿势图走 `MOSSImageControl` 的 depth map。
+
+| 环节 | 节点与参数 |
+|---|---|
+| 参考图 | `LoadImage → ImageScaleToTotalPixels(megapixels=1.0) → VAEEncode → KSampler.latent_image`，denoise 0.85~0.87 |
+| 姿势图 | `LoadImage → DepthAnythingV2Preprocessor(vits) → ImageScaleToTotalPixels → MOSSImageControl(depth_map, strength 0.7, end_percent 0.7)` |
+| 控制权重 | `LoraLoaderModelOnly(moss_image_color_depth_control.safetensors, 1.0)`，接在 UNETLoader 之后 |
+
+**不要用 `ReferenceLatent` 承载参考图。** 它是给 Qwen-Edit / Flux Kontext 那类编辑模型设计的，MOSS 上会把参考图当结构图处理：双参考图串起来出糊图，单参考图直接把画面画成铅笔素描。`model_base` 里虽然有 `reference_latents` 的实现，但那不是给这条链路用的。
+
+两张图的分工有主次：参考图是首帧，**决定了画布比例、大致构图、角色底子**；姿势图只约束姿态和前后关系。两者冲突时参考图赢——拿站姿立绘配跪姿参考，出来的还是竖长画布、构图偏立绘，只是人物跪下来了。想要姿势主导，就换一张姿态接近的人设图，或者把 denoise 提到 0.9。
+
+深度模型必须放在插件自己的目录：`custom_nodes/comfyui_controlnet_aux/ckpts/depth-anything/Depth-Anything-V2-Small/`。放 `models/controlnet/` 不会被识别，节点会去 HF 重新下载并卡在下载状态。
 
 ## 配套节点
 
