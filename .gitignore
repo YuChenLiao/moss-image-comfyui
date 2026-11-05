@@ -3,3 +3,6 @@ __pycache__/
 .DS_Store
 Thumbs.db
 *.bak
+
+# 私人内容，不进仓库
+reference/private/
