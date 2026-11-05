@@ -89,3 +89,4 @@ masterpiece, best quality, anime style, cel shading,
 | 参考图复刻四步流程、问题修正对照表 | `reference/replication.md` |
 | 四种工作流、性能与故障对照、配套节点 | `reference/workflows.md` |
 | 实测完整提示词示例（单双人、变量替换） | `reference/examples.md` |
+| 私人技法笔记（成人向，仅本地、不纳入版本控制） | `reference/private/` |
