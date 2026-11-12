@@ -67,6 +67,7 @@ tag 段放身份锚点；中文段按"场景 → 姿势 → 服装 → 道具 �
 | 胸部/臀宽被参考图带大，角色原本是纤细体型 | 体型由 i2i 轮廓传入，tag 顶不住，而且形容词会反向强化。正向改写否定句（"身材纤细，胸部小巧，与角色本身的体型一致，不要夸张的胸部与臀部"），负面压 `large breasts, huge breasts, exaggerated breasts, wide hips, thick thighs`，denoise 提到 0.92。实测同 seed 三件套一次到位 |
 | 画面突然变水墨或厚涂 | 缺 `anime style, cel shading`；或换了 `@wlop` 这类半写实画师 |
 | 造型改动不动（换发型、加耳饰、改服装形制） | 角色 tag 的先验会压过中文描述。把改动写成 tag 塞进 tag 区（`twintails, high twintails, black hair ribbon`），负面压 `loose hair, long hair down`。实测：同一段中文描述改两轮无效，换 tag 一次生效 |
+| 参考图是裸露构图，但要求不走光 | 别指望链饰/布料"顺便遮住"——写"胸口的链子把胸部遮住"实测无效，模型会在链子旁边照露。正解是**双手遮住**：写死两臂角度与手掌落点（"右臂屈肘约 90°，右手掌心贴在左侧胸口、四指并拢；左臂屈肘约 60°，左手掌贴在右侧胸下缘；手肘夹在身体两侧，手掌与手指把胸部完全遮住"），负面压 `nipples, exposed nipples, areola, visible nipples, spread fingers, open palms` |
 | 姿势飘（朝向、站姿、手放哪都不对） | 按"朝向/重心/关节角度/手脚落点"四个维度逐项写死，见上文「动作必须写到关节」 |
 | 动作僵直、正面站桩、双手贴在身体两侧 | i2i 里先降 denoise 到 0.88–0.89 锁回参考骨相，再叠四维描述；负面压 `stiff pose, symmetrical pose, arms at sides, arms down, facing camera, hands behind back`。实测 0.90 会重绘成正面站桩，0.89 直接贴回参考 |
 | 服装凭空消失（该穿的内衣/配饰没了） | 点名部件而非笼统说"穿着"：把"穿着胸罩"改成"两肩细肩带与绕到背后的横向背带都清晰可见、贴合后背，蕾丝纹样能看清"，负面加 `topless, no bra, bare chest, missing clothing` |
