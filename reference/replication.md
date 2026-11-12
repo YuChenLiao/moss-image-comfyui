@@ -52,6 +52,7 @@ tag 段放身份锚点；中文段按"场景 → 姿势 → 服装 → 道具 �
 | 腿被抬高、脚翘到画面上方 | 别用"膝盖弯曲搭在另一条腿上"——"搭在…上方"会被理解成高抬腿。改成"右腿屈膝侧放、小腿贴地、脚背朝下"，负面压 `raised leg, leg up, foot in the air` |
 | 腿被拉长、大头 | 姿势换成折叠态（抱膝、蜷坐），加"四肢长度自然，头身比例正常，头部与肩宽协调"，负面压 `long legs, elongated body, big head` |
 | 手指畸形 | 正向"双手五指分明，每只手五根手指，关节位置正确"，负面 `extra fingers, six fingers, fused fingers, bad hands` |
+| 手被画框裁掉、手指糊成一团 | 多半是参考图比例太窄（9:16）把人物撑满。把参考图垫进 4:5 / 3:4 画布居中重出（`workflows.md`「画幅决定手会不会崩」），提示词写"人物占画面约七成、头顶手腕两膝臀部都留边距、无裁切"，负面压 `hands out of frame, cropped hands`。别用提高 megapixels 的办法，2.3MP 是上限 |
 | 服装跑偏 | 长度与材质双写（"极短只到大腿根部"+"薄纱半透明"），负面反向压（`long dress, opaque fabric, thick lace`） |
 | 表情不对 | 拆成嘴形 + 眼型 + 脸红三件事分别写，负面排除（`closed mouth, serious expression, closed eyes`） |
 | 构图变形 | 用方位描述死（"头部位于右上方，双腿向左下延伸构成对角线"），点名主体在画面中部 |
