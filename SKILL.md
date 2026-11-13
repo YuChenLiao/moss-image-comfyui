@@ -90,6 +90,7 @@ masterpiece, best quality, anime style, cel shading,
 | 需要什么 | 读哪个 |
 |---|---|
 | 复杂度分级（L1/L2/L3）、维度清单、变量模板与词组库 | `reference/prompting.md` |
+| 构图的量化拆解、8 条判据、构图崩法对照、多图学习与校准回路 | `reference/composition.md` |
 | 三种输出格式（Tag/Caption/Layout）、画风首句、Layout JSON 坐标、多人主语绑定、光照与材质 | `reference/prompting-formats.md` |
 | 参考图复刻四步流程、问题修正对照表 | `reference/replication.md` |
 | 四种工作流、性能与故障对照、配套节点 | `reference/workflows.md` |

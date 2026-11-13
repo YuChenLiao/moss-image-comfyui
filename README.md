@@ -46,6 +46,7 @@ L3 档位（全描述）适合这种元素密集的场景：温室的金属框�
 |---|---|
 | [`SKILL.md`](SKILL.md) | 六条硬性原则、权重选型表、采样参数、提示词核心、文件导航 |
 | [`reference/prompting.md`](reference/prompting.md) | 复杂度分级（L1/L2/L3）、十维清单、十一个变量模板与候选词组库 |
+| [`reference/composition.md`](reference/composition.md) | 构图的量化拆解（画幅/机位/朝向/占比＋画面轴线）、8 条判据、构图崩法对照、多图学习与"一次改一个变量"的校准回路 |
 | [`reference/replication.md`](reference/replication.md) | 参考图复刻四步流程、十二项问题修正对照表 |
 | [`reference/workflows.md`](reference/workflows.md) | 四种工作流、性能数据、故障对照、配套节点 |
 | [`reference/examples.md`](reference/examples.md) | 四组实测完整提示词（单双人、变量替换） |
