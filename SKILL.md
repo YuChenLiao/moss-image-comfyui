@@ -83,6 +83,19 @@ masterpiece, best quality, anime style, cel shading,
 
 上面是 **Tag 模式**。MOSS 还能吃纯自然语言 Caption 和带坐标的 JSON Layout（海报排版、漫画分格、多人严格占位必须用它）。三种格式的画风首句、质量词取舍、多人主语绑定、Layout 坐标转换全在 `reference/prompting-formats.md`——**换格式前先读它**，尤其别把 `masterpiece, best quality` 带进 Caption 和 Layout。
 
+## 脚本
+
+`scripts/` 下的工具把可以量化的部分从"靠记"变成"跑一遍"。都是纯标准库（除 `pad_canvas.py` 要 Pillow），退出码带语义，可以直接串在出图流程前后。
+
+| 脚本 | 做什么 | 典型调用 |
+|---|---|---|
+| `frame.py` | 给 megapixels + 比例算像素对；或校验一组像素是否合法（上限/下限/16 对齐/比例偏差） | `python scripts/frame.py 2.3 --ratio 3:4` |
+| `pad_canvas.py` | 把参考图垫进更宽画布，救回被裁的手脚；默认取边缘中位色补边 | `python scripts/pad_canvas.py ref.png --ratio 3:4 --out ref_wide.png` |
+| `prompt_lint.py` | 提示词体检：角色 tag 与外貌词冲突、部件定色缺失、层级缺失、正负互斥、防护覆盖、构图三件套、体型否定句、长度与 token | `python scripts/prompt_lint.py --from-sidecar out.json` |
+| `denoise_advice.py` | 改动类型 → denoise 建议，附步数/CFG 红线检查 | `python scripts/denoise_advice.py 改衣物 --steps 24 --cfg 1.5 --dmd` |
+
+`prompt_lint.py` 的规则编号（R13–R22）与 `reference/composition.md` 的量化表一一对应，改文档就等于改 lint。
+
 ## 文件导航
 
 按需读取，不要一次全看。
