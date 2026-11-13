@@ -1,6 +1,6 @@
 ---
 name: moss-image-comfyui
-description: 在本地 ComfyUI 上用 MOSS-Image（OpenMOSS 的 5B DiT 文生图模型）出图的操作手册：权重选型与量化、采样配方、danbooru tag 与中文自然语言的混合提示词、参考图复刻流程、常见问题修正对照、图生图 denoise 区间、局部重绘、分辨率与显存上限。Use when generating images with MOSS / MOSS-Image in ComfyUI, replicating a reference image with a different character, or debugging noise / bad proportions / bad hands / drifted clothing / lost lighting.
+description: 在本地 ComfyUI 上用 MOSS-Image（OpenMOSS 的 5B DiT 文生图模型）出图的操作手册：权重选型与量化、采样配方、danbooru tag 与中文自然语言的混合提示词、参考图复刻流程、常见问题修正对照、图生图 denoise 区间、局部重绘、分辨率与崩图排查。Use when generating images with MOSS / MOSS-Image in ComfyUI, replicating a reference image with a different character, or debugging noise / bad proportions / bad hands / drifted clothing / lost lighting.
 ---
 
 # MOSS-Image 在 ComfyUI 上出图
@@ -11,7 +11,9 @@ description: 在本地 ComfyUI 上用 MOSS-Image（OpenMOSS 的 5B DiT 文生图
 
 1. **不要套 `ModelSamplingSD3`**。它的 `multiplier=1000` 与 MOSS 内置的 `multiplier=1.0 / shift=5.0` 冲突，sigma 时间步错放 1000 倍，输出退化成纯彩色噪声。shift 5.0 已内置，要改只能用 `ModelSamplingAuraFlow`。
 2. **图生图 denoise 不得低于 0.85**。MOSS 没做 img2img 训练：0.9 正常、0.8 出现噪点、0.65 明显劣化、0.45 是纯噪声。它给的是"锁构图换风格"，不是"轻微修图"。**0.90 是改衣物/裸露度的安全档，0.92 只用来纠正轮廓**（压体型、拉开裁切）——0.92 配上大改衣物会让构图脱锁，出现头朝下、腿交叉、脸崩。
-3. **分辨率上限 2.3MP**。2016×1152 稳定；2688×1536（4MP）会打爆 20GB 显存直接干掉进程。
+3. **分辨率没有硬上限，2.3MP 只是舒适区**。2016×1152 很稳，2.4MP（1344×1792）在本机实测也没问题；面积变大只是把显存余量压薄，不是崩图的唯一原因。
+   崩图是多因素的：显存占用与碎片（同进程切档、连续出图累积）、权重精度（bf16 18.6GB vs int8 12GB）、注意力实现与节点版本、VAE 解码峰值、batch 与文本长度、驱动/ROCm 版本、同时开着的其他进程。
+   **遇到崩先定位阶段**：采样阶段掉多半是显存/注意力；解码阶段掉看 VAE；出图正常但变慢看碎片。别用一个像素数字给所有崩图背锅。
 4. **低于 1.5MP 五官必糊**。1MP 下人物脸只有几十像素，50 步会把小脸平均掉。要五官清晰就给到 2MP 以上，或让人物占画面更大比例。
 5. **角色与画师用 tag 锚定，场景与氛围用中文写**。专有名词是成对训练的，tag 是短路；场景光线材质是组合语义，自然语言才准。
 6. **写了角色 tag 就不要再补外貌词**。发色、瞳色、发型、体态、耳尾都是 tag 已经带住的东西；在中文段重复写一遍等于给它二次下指令，两边不一致时被改掉的是 tag——实测写"浅蓝色长发"配 `miyo (blue archive)`，出图发色直接跑成浅蓝，而该角色的官方共现 tag 是 `grey_hair` + `yellow_eyes` + `braid`；删掉全部外貌词、只留 tag 后一次就对。服装、道具、姿势、场景、光线照常写，它们不在 tag 的先验里。**体型是唯一例外**：它会被 i2i 参考图轮廓直接盖掉，要用否定句纠正（"身材纤细，胸部小巧，与角色本身的体型一致，不要夸张的胸部与臀部"）＋ denoise 0.92 ＋ 负面 `large breasts, wide hips`，绝不能写"丰满"这类形容词（会被正向强化）。

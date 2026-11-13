@@ -1,25 +1,29 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""算 MOSS 该用什么像素，或者校验一组像素是否合法。
+"""算 MOSS 该用什么像素，或者校验一组像素。
 
 三种用法：
 
     # 给 megapixels 与比例，算像素对
-    python frame.py 2.3 --ratio 4:5
+    python frame.py 2.3 --ratio 3:4
 
-    # 给像素，校验上限/下限/16 对齐
+    # 给像素，看它落在什么区间
     python frame.py --pixels 1344x1792
 
     # 读一张图的比例，算 mp 对应的像素（需要 Pillow）
     python frame.py 2.3 --from-image ref.png
 
-硬约束（来自 SKILL.md 与 reference/workflows.md 的实测）：
-    2.3MP 是显存上限，4MP 必崩；低于 1.5MP 五官必糊；
-    latent 是 16 倍下采样，宽高都要对齐 16。
+    # 附崩图排查清单
+    python frame.py --pixels 2688x1536 --factors
 
-对齐方式默认 ceil（向上取整），这也是 ComfyUI 的
-ImageScaleToTotalPixels 的实际行为——所以算出来的 MP 会比设定值高几个百分点，
-不是 bug，是那 5% 溢出的来源。
+态度：**面积不是硬上限。**
+    latent 是 16 倍下采样，宽高必须对齐 16——这条是硬的；
+    2.3MP 只是舒适区，2.4MP（1344×1792）在本机实测照样出图；
+    面积变大只是把显存余量压薄，崩图另有诱因（权重精度、碎片、同进程切档、
+    注意力实现、VAE 解码峰值、文本长度、驱动），所以这里只给观察，不判对错。
+    低于 1.5MP 时五官会糊，那是画质约束，和崩不崩没关系。
+
+退出码：只有输入非法（比例非正、像素不可解析）才非零，方便串联而不误杀大图。
 """
 
 import argparse
@@ -32,14 +36,26 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
-MP_MAX = 2.3
-MP_MIN = 1.5
+COMFORT = 2.3      # 舒适区，不是上限
+HEAVY = 4.0        # 到这一步显存余量已经很薄
+MP_MIN = 1.5       # 低于此值五官会糊（画质约束）
 ALIGN = 16
+
+FACTORS = """崩图排查顺序（面积只是其中一项）
+  1 阶段定位     日志掉在采样阶段 → 显存/注意力；掉在 VAEDecode → 解码峰值；跑完慢 → 碎片
+  2 显存余量     /system_stats 的 vram_free，干净时约 19.4GB；只剩零点几 GB 就是碎片态，重启
+  3 权重精度     bf16 约 18.6GB，int8_convrot 约 12GB；同一进程里来回换档必然变慢
+  4 注意力与节点  sparse / blockcache 之类插件的实现与版本，换版本后先用小图验证
+  5 文本长度     超长 prompt 抬高编码器显存与耗时，先砍重复措辞
+  6 batch 与其他  同时跑图、开着大页面的浏览器都会抢显存
+  7 VAE 与大图   大画幅的解码峰值常高于采样峰值，可用 tiled decode
+  8 驱动与系统   ROCm 版本、32GB 内存下的 swap，都会表现为“随机崩”
+结论：同样的 2688×1536 这次崩、下次不一定崩，别用一个像素数字背锅。"""
 
 
 def fail(msg):
     print(f"错误：{msg}", file=sys.stderr)
-    sys.exit(1)
+    sys.exit(2)
 
 
 def align_up(v, step=ALIGN):
@@ -48,7 +64,7 @@ def align_up(v, step=ALIGN):
 
 def parse_ratio(text):
     if ":" not in text:
-        fail(f"比例要写成 4:5 这种形式，收到 {text!r}")
+        fail(f"比例要写成 3:4 这种形式，收到 {text!r}")
     a, b = text.split(":", 1)
     try:
         w, h = float(a), float(b)
@@ -80,20 +96,17 @@ def from_mp(mp, ratio, mode="ceil"):
     return f(w), f(h)
 
 
-def verdict(mp, target=None):
-    """设定值超限才算违规；对齐带来的几个百分点溢出是必然的，只做提示。"""
-    base = target if target else mp
+def verdict(mp):
+    """只给观察，不判定对错。"""
     out = []
-    hard = []
-    if base > MP_MAX:
-        hard.append(f"设定 {base:.2f}MP 超过显存上限 {MP_MAX}MP")
-    if mp > 3.0:
-        hard.append(f"实际 {mp:.2f}MP 已进入崩进程区间（4MP 必崩）")
-    elif mp > 2.45:
-        out.append(f"实际 {mp:.2f}MP 比对上限 2.3MP 高出较多，注意显存")
+    if mp >= HEAVY:
+        out.append(f"实际 {mp:.2f}MP：显存余量已经很薄。先看 vram_free 与权重精度，再决定要不要降")
+    elif mp > COMFORT:
+        out.append(f"实际 {mp:.2f}MP：略高于舒适区 {COMFORT}MP，本机能出图，留意碎片累积")
     if mp < MP_MIN:
-        hard.append(f"实际 {mp:.2f}MP 低于 {MP_MIN}MP：人物脸只有几十像素，五官会被平均掉")
-    return hard + out, bool(hard)
+        out.append(f"实际 {mp:.2f}MP 低于 {MP_MIN}MP：人物脸只有几十像素，五官会被平均掉"
+                   "（画质问题，不是崩图问题）")
+    return out
 
 
 def report(mp_target, w, h, ratio_hint=None):
@@ -115,14 +128,15 @@ def report(mp_target, w, h, ratio_hint=None):
 
 
 def main():
-    ap = argparse.ArgumentParser(description="算 MOSS 像素对，或校验一组像素")
+    ap = argparse.ArgumentParser(description="算 MOSS 像素对，或看一组像素落在什么区间")
     ap.add_argument("megapixels", nargs="?", type=float, help="目标面积，单位 MP（如 2.3）")
-    ap.add_argument("--ratio", help="宽:高，如 4:5 / 9:16 / 3:2")
+    ap.add_argument("--ratio", help="宽:高，如 3:4 / 9:16 / 3:2")
     ap.add_argument("--pixels", help="直接给像素，如 1344x1792")
     ap.add_argument("--from-image", help="读这张图的宽高比（需要 Pillow）")
     ap.add_argument("--align", choices=["ceil", "round"], default="ceil",
                     help="对齐方式，默认 ceil（ComfyUI 实际行为）")
     ap.add_argument("--json", action="store_true", help="输出 JSON")
+    ap.add_argument("--factors", action="store_true", help="附崩图排查清单")
     args = ap.parse_args()
 
     ratio_hint = None
@@ -140,36 +154,37 @@ def main():
             with Image.open(args.from_image) as im:
                 iw, ih = im.size
             ratio_hint = iw / ih
-            rows_ratio = f"{iw}×{ih} → 比例 {ratio_hint:.4f}"
+            source = f"{iw}×{ih} → 比例 {ratio_hint:.4f}"
         elif args.ratio:
             ratio_hint = parse_ratio(args.ratio)
-            rows_ratio = f"设定比例 {args.ratio}"
+            source = f"设定比例 {args.ratio}"
         else:
             fail("给 --ratio 或 --from-image 之一")
         w, h = from_mp(args.megapixels, ratio_hint, args.align)
         rows, mp = report(args.megapixels, w, h, ratio_hint)
-        rows.insert(0, ("输入", rows_ratio))
+        rows.insert(0, ("输入", source))
 
-    issues, bad_issue = verdict(mp, args.megapixels if not args.pixels else None)
+    issues = verdict(mp)
 
     if args.json:
         print(json.dumps({
             "width": w, "height": h, "megapixels": round(mp, 4),
             "ratio": round(w / h, 4),
             "aligned16": w % ALIGN == 0 and h % ALIGN == 0,
-            "issues": issues,
-            "exit_ok": not bad_issue,
+            "notes": issues,
         }, ensure_ascii=False, indent=2))
     else:
         width = max(len(k) for k, _ in rows)
         for k, v in rows:
             print(f"{k.ljust(width)}  {v}")
         for i in issues:
-            print(f"注意：{i}")
+            print(f"提示：{i}")
+        if args.factors:
+            print()
+            print(FACTORS)
 
-    # 有硬性问题或没对齐时返回非零，方便脚本串联
-    bad = bad_issue or w % ALIGN != 0 or h % ALIGN != 0
-    sys.exit(1 if bad else 0)
+    # 面积大不算失败，只有输入非法才非零
+    sys.exit(0)
 
 
 if __name__ == "__main__":
