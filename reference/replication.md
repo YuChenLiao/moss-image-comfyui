@@ -55,6 +55,7 @@ tag 段放身份锚点；中文段按"场景 → 姿势 → 服装 → 道具 �
 | 腿被拉长、大头 | 姿势换成折叠态（抱膝、蜷坐），加"四肢长度自然，头身比例正常，头部与肩宽协调"，负面压 `long legs, elongated body, big head` |
 | 手指畸形 | 正向"双手五指分明，每只手五根手指，关节位置正确"，负面 `extra fingers, six fingers, fused fingers, bad hands` |
 | 手被画框裁掉、手指糊成一团 | 多半是参考图比例太窄（9:16）把人物撑满。把参考图垫进 4:5 / 3:4 画布居中重出（`workflows.md`「画幅决定手会不会崩」），提示词写"人物占画面约七成、头顶手腕两膝臀部都留边距、无裁切"，负面压 `hands out of frame, cropped hands`。别用提高 megapixels 的办法，2.3MP 是上限 |
+| 连裤袜被画成踩脚袜/露出脚趾 | "连裤袜"在中文里既可以指连裤黑丝也可以指踩脚款。写死包覆范围："从腰一直包到脚趾，脚背与脚趾都被黑色的袜布包住，没有露出皮肤"，负面压 `toeless tights, footless tights, stirrup tights, bare feet`；要赤脚则反过来写"裤脚卷到脚踝上方、脚趾清楚可见"并压 `shoes, boots, socks` |
 | 要去掉鞋袜（赤脚） | 别只删掉"鞋子"那句——参考图有靴子时模型会自己补。正向明确写"不穿鞋也不穿袜：连裤袜的裤脚卷到脚踝上方，两只脚赤裸，脚背与五根脚趾清楚可见，脚底贴着床单"，负面压 `shoes, boots, footwear, sneakers, socks, heels` |
 | 服装跑偏 | 长度与材质双写（"极短只到大腿根部"+"薄纱半透明"），负面反向压（`long dress, opaque fabric, thick lace`） |
 | 内裤穿在裤袜外面（层级颠倒） | 只写"黑色连裤袜 + 白色蕾丝内裤"模型会按出现顺序叠，内裤跑到最外层。要把层级写成句子：`黑色不透光的连裤袜` → `连裤袜在胯部有一处破开的裂口` → `白色蕾丝内裤穿在连裤袜里面，从裂口处露出一小片`；负面压 `panties over tights, underwear over stockings, panties outside tights, layered wrongly` |
